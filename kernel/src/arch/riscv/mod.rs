@@ -16,7 +16,7 @@ pub mod io;
 pub mod memory;
 pub mod paging;
 pub mod rand;
-mod sbi;
+pub mod sbi;
 pub mod signal;
 pub mod syscall;
 pub mod timer;
@@ -27,6 +27,9 @@ use riscv::register::sie;
 
 #[no_mangle]
 pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
+    sbi::console_putchar('O' as usize);
+    sbi::console_putchar('K' as usize);
+
     let device_tree_vaddr = phys_to_virt(device_tree_paddr);
 
     unsafe {
