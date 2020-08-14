@@ -27,37 +27,46 @@ use riscv::register::sie;
 
 #[no_mangle]
 pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
+    /*
     sbi::console_putchar('O' as usize);
     sbi::console_putchar('K' as usize);
     sbi::console_putchar('|' as usize);
     //sbi::console_putchar('\r\n' as usize);
+     */
+    info!("OK");
 
     let device_tree_vaddr = phys_to_virt(device_tree_paddr);
-
-    io::putstr("Hello world!|");
 
     unsafe {
         cpu::set_cpu_id(hartid);
     }
-
-    io::putstr("after setting CPU|");
 
     if hartid != BOOT_HART_ID {
         while !AP_CAN_INIT.load(Ordering::Relaxed) {}
         others_main(hartid);
     }
 
-    io::putstr("I am BOOT_HART|");
+    info!("BOOT_HART here");
 
     unsafe {
         memory::clear_bss();
     }
 
-    io::putstr("bss cleared|");
+    info!("bss cleared");
 
     crate::logging::init();
 
-    io::putstr("set logging|");
+    info!("init logging");
+
+    unsafe {
+        trapframe::init();
+    }
+
+    info!("init trapframe");
+
+    memory::init(device_tree_vaddr);
+
+    info!("init memory");
 
     /*
     info!(
@@ -66,19 +75,9 @@ pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
     );
      */
 
-    unsafe {
-        trapframe::init();
-    }
-
-    io::putstr("set trapframe");
-
-    memory::init(device_tree_vaddr);
-
-    io::putstr("set memory");
-
     timer::init();
 
-    io::putstr("set timer");
+    info!("init timer");
 
     // TODO: init driver on u540
     #[cfg(not(any(feature = "board_u540")))]
@@ -86,7 +85,12 @@ pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
     unsafe {
         board::init_external_interrupt();
     }
+
+    info!("init driver");
+
     crate::process::init();
+
+    info!("init process");
 
     AP_CAN_INIT.store(true, Ordering::Relaxed);
     crate::kmain();

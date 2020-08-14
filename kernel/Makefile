@@ -249,6 +249,12 @@ build: $(kernel_img)
 asm:
 	@$(objdump) -d $(kernel) | less
 
+asm-save:
+	@$(objdump) -d $(kernel) > $(build_path)/asm
+
+vim-asm:
+	vim $(build_path)/asm
+
 header:
 	@$(objdump) -h $(kernel)
 
