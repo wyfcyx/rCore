@@ -16,6 +16,7 @@ pub fn init(dtb: usize) {
     init_frame_allocator();
     init_heap();
     remap_the_kernel(dtb);
+    heap_test();
 }
 
 pub fn init_other() {
@@ -98,4 +99,22 @@ pub fn get_page_fault_addr() -> usize {
 pub fn set_page_table(vmtoken: usize) {
     satp::write(vmtoken);
     unsafe { sfence_vma_all() }
+}
+
+fn heap_test() {
+    use alloc::boxed::Box;
+    use alloc::vec::Vec;
+    let v = Box::new(10);
+    assert_eq!(*v, 10);
+    core::mem::drop(v);
+
+    let mut vec = Vec::new();
+    for i in 0..100 {
+        vec.push(i);
+    }
+    assert_eq!(vec.len(), 100);
+    for (i, val) in vec.iter().enumerate() {
+        assert_eq!(i, *val);
+    }
+    info!("memory test passed");
 }
