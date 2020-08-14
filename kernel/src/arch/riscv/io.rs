@@ -14,3 +14,10 @@ pub fn putfmt(fmt: Arguments) {
     }
     // might miss some early messages, but it's okay
 }
+
+pub fn putstr(str: &'static str) {
+    for c in str.as_bytes() {
+        sbi::console_putchar(*c as usize);
+    }
+}
+

@@ -29,33 +29,57 @@ use riscv::register::sie;
 pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
     sbi::console_putchar('O' as usize);
     sbi::console_putchar('K' as usize);
+    sbi::console_putchar('|' as usize);
+    //sbi::console_putchar('\r\n' as usize);
 
     let device_tree_vaddr = phys_to_virt(device_tree_paddr);
+
+    io::putstr("Hello world!|");
 
     unsafe {
         cpu::set_cpu_id(hartid);
     }
+
+    io::putstr("after setting CPU|");
 
     if hartid != BOOT_HART_ID {
         while !AP_CAN_INIT.load(Ordering::Relaxed) {}
         others_main(hartid);
     }
 
+    io::putstr("I am BOOT_HART|");
+
     unsafe {
         memory::clear_bss();
     }
 
+    io::putstr("bss cleared|");
+
+    crate::logging::init();
+
+    io::putstr("set logging|");
+
+    /*
     info!(
         "Hello RISCV! in hart {}, device tree @ {:#x}",
         hartid, device_tree_vaddr
     );
+     */
 
-    crate::logging::init();
     unsafe {
         trapframe::init();
     }
+
+    io::putstr("set trapframe");
+
     memory::init(device_tree_vaddr);
+
+    io::putstr("set memory");
+
     timer::init();
+
+    io::putstr("set timer");
+
     // TODO: init driver on u540
     #[cfg(not(any(feature = "board_u540")))]
     board::init(device_tree_vaddr);
