@@ -68,12 +68,10 @@ pub extern "C" fn rust_main(hartid: usize, device_tree_paddr: usize) -> ! {
 
     info!("init memory");
 
-    /*
-    info!(
+    println!(
         "Hello RISCV! in hart {}, device tree @ {:#x}",
         hartid, device_tree_vaddr
     );
-     */
 
     timer::init();
 

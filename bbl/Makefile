@@ -161,7 +161,7 @@ bbl.bin: bbl
 
 bbl_fpga.bin: bbl_fpga
 	riscv64-unknown-elf-objcopy -S -O binary --change-addresses -0x80000000 $< $@
-	cp $@ $(cygwin)
+	#cp $@ $(cygwin)
 
 bbl_sim.bin: bbl_sim
 	riscv64-unknown-elf-objcopy -S -O binary --change-addresses -0x800000000 $< $@

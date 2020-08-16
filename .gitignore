@@ -2,6 +2,8 @@ build
 target
 /kernel/src/arch/x86_64/interrupt/vector.asm
 /kernel/src/arch/mipsel/boot/linker.ld
+/bbl/bbl_fpga
+/bbl/bbl_fpga.bin
 *.gen.s
 *.dtb
 
