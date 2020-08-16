@@ -3,6 +3,7 @@ use core::time::Duration;
 use log::*;
 use riscv::register::*;
 
+/*
 #[cfg(target_arch = "riscv64")]
 pub fn get_cycle() -> u64 {
     time::read() as u64
@@ -19,6 +20,7 @@ pub fn get_cycle() -> u64 {
         }
     }
 }
+*/
 
 /// Enable timer interrupt
 pub fn init() {
@@ -30,16 +32,21 @@ pub fn init() {
     info!("timer: init end");
 }
 
+pub fn read_time() -> u64 {
+    let mtime = 0xffff_ffff_4200_bff8 as *const u64;
+    unsafe { mtime.read_volatile() }
+}
+
 /// Set the next timer interrupt
 pub fn set_next() {
     // 100Hz @ QEMU
     let timebase = 250000;
-    sbi::set_timer(get_cycle() + timebase);
+    sbi::set_timer(/* get_cycle() */ read_time() + timebase);
 }
 
 pub fn timer_now() -> Duration {
     // TODO: get actual freq
     const FREQUENCY: u16 = 2600;
-    let time = get_cycle();
+    let time = /* get_cycle() */ read_time();
     Duration::from_nanos(time * 1000 / FREQUENCY as u64)
 }
