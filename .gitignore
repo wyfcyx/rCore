@@ -4,6 +4,7 @@ target
 /kernel/src/arch/mipsel/boot/linker.ld
 /bbl/bbl_fpga
 /bbl/bbl_fpga.bin
+/nuser/build/*
 *.gen.s
 *.dtb
 
